@@ -5,6 +5,7 @@ import 'package:gifts_rep/extensions/theme_extension.dart';
 import 'package:gifts_rep/presentation/home/view/home_page.dart';
 import 'package:gifts_rep/presentation/login/bloc/login_bloc.dart';
 import 'package:gifts_rep/presentation/login/model/model.dart';
+import 'package:gifts_rep/presentation/registration/view/registration_page.dart';
 import 'package:gifts_rep/resources/app_colors.dart';
 
 class LoginPage extends StatelessWidget {
@@ -112,7 +113,8 @@ class _LoginPageWidgetState extends State<_LoginPageWidget> {
                 ),
               ),
               TextButton(
-                onPressed: () => debugPrint("Нажали на кнопку создать"),
+                onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const RegistrationPage())),
                 child: const Text("Создать"),
               ),
             ],
@@ -153,7 +155,6 @@ class _LoginButton extends StatelessWidget {
                       .add(const LoginLoginButtonClicked())
                   : null,
               child: const Text("Войти"),
-
             );
           },
         ),
