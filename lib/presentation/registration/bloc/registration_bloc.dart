@@ -9,7 +9,11 @@ part 'registration_event.dart';
 part 'registration_state.dart';
 
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
-  RegistrationBloc() : super(RegistrationFieldsInfo(avatarLink: '')) {
+
+  static String _avatarBuilder(String key) => 'https://api.dicebear.com/5.x/croodles/svg?seed=$key';
+
+
+  RegistrationBloc() : super(RegistrationFieldsInfo(avatarLink: _avatarBuilder('asss'))) {
     on<RegistrationEvent>((event, emit) {
       // TODO: implement event handler
     });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gifts_rep/extensions/theme_extension.dart';
 import 'package:gifts_rep/presentation/registration/bloc/registration_bloc.dart';
 import 'package:gifts_rep/presentation/theme/build_context.dart';
@@ -36,39 +37,52 @@ class _RegistrationPageWidgetState extends State<_RegistrationPageWidget> {
       appBar: AppBar(),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.only(
-              left: 8,
-              top: 6,
-              bottom: 6,
-              right: 4,
-            ),
-            decoration: BoxDecoration(
-              color: context.dynamicPlainColor(
-                context: context,
-                lightThemeColor: AppColors.lightLightBlue100,
-                darkThemeColor: AppColors.darkWhite20,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  height: 48,
-                  width: 48,
-                ),
-                const SizedBox(width: 8),
-                Text("Ваш аватар", style: context.theme.h3),
-                const Spacer(),
-                TextButton(
-                  onPressed: () => context
-                      .read<RegistrationBloc>()
-                      .add(const RegistrationChangeAvatar()),
-                  child: Text("Изменить"),
-                ),
-              ],
-            ),
+          const _AvatarWidget(),
+        ],
+      ),
+    );
+  }
+}
+
+class _AvatarWidget extends StatelessWidget {
+  const _AvatarWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.only(
+        left: 8,
+        top: 6,
+        bottom: 6,
+        right: 4,
+      ),
+      decoration: BoxDecoration(
+        color: context.dynamicPlainColor(
+          context: context,
+          lightThemeColor: AppColors.lightLightBlue100,
+          darkThemeColor: AppColors.darkWhite20,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          SvgPicture.network(
+            'https://api.dicebear.com/5.x/croodles/svg',
+
+            height: 48,
+            width: 48,
+          ),
+          const SizedBox(width: 8),
+          Text("Ваш аватар", style: context.theme.h3),
+          const Spacer(),
+          TextButton(
+            onPressed: () => context
+                .read<RegistrationBloc>()
+                .add(const RegistrationChangeAvatar()),
+            child: Text("Изменить"),
           ),
         ],
       ),
