@@ -31,14 +31,93 @@ class _RegistrationPageWidget extends StatefulWidget {
 }
 
 class _RegistrationPageWidgetState extends State<_RegistrationPageWidget> {
+  // для перехода на след поле ввода
+  late final FocusNode _emailFocusNode;
+  late final FocusNode _passwordFocusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailFocusNode = FocusNode();
+    _passwordFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          const _AvatarWidget(),
-        ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text("Создать аккаунт", style: context.theme.h2),
+                  ),
+                  const SizedBox(height: 24),
+                  _EmailTextField(
+                    emailFocusNode: _emailFocusNode,
+                    passwordFocusNode: _passwordFocusNode,
+                  ),
+                  const SizedBox(height: 16),
+                  _AvatarWidget(),
+                ],
+              ),
+            ),
+            _RegisterButton(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmailTextField extends StatelessWidget {
+  const _EmailTextField({
+    Key? key,
+    required FocusNode emailFocusNode,
+    required FocusNode passwordFocusNode,
+  })  : _emailFocusNode = emailFocusNode,
+        _passwordFocusNode = passwordFocusNode,
+        super(key: key);
+
+  final FocusNode _emailFocusNode;
+  final FocusNode _passwordFocusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 36),
+      // через BlocSelector подписываемся на ошибку email
+      child: BlocBuilder<RegistrationBloc, RegistrationState>(
+        buildWhen: (_, current) => current is RegistrationFieldsInfo,
+        builder: (context, state) {
+          final fieldsInfo = state as RegistrationFieldsInfo;
+          final error = fieldsInfo.emailError;
+          return TextField(
+            focusNode: _emailFocusNode,
+            onChanged: (text) => context
+                .read<RegistrationBloc>()
+                .add(RegistrationEmailChanged(text)),
+            onSubmitted: (_) => _passwordFocusNode.requestFocus(),
+            autocorrect: false,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              labelText: 'Почта',
+              errorText: error?.toString(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -69,11 +148,16 @@ class _AvatarWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SvgPicture.network(
-            'https://api.dicebear.com/5.x/croodles/svg',
-
-            height: 48,
-            width: 48,
+          BlocBuilder<RegistrationBloc, RegistrationState>(
+            buildWhen: (_, current) => current is RegistrationFieldsInfo,
+            builder: (context, state) {
+              final fieldsInfo = state as RegistrationFieldsInfo;
+              return SvgPicture.network(
+                fieldsInfo.avatarLink,
+                height: 48,
+                width: 48,
+              );
+            },
           ),
           const SizedBox(width: 8),
           Text("Ваш аватар", style: context.theme.h3),
@@ -85,6 +169,38 @@ class _AvatarWidget extends StatelessWidget {
             child: Text("Изменить"),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RegisterButton extends StatelessWidget {
+  const _RegisterButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: SizedBox(
+        width: double.infinity,
+        //BlocSelector(имитирует получен состояние) состояние
+        // дизаблим кнопку если одно из полей не валидно
+        // если все верно заполнено, то осуществляем авторизацию
+        child: BlocSelector<RegistrationBloc, RegistrationState, bool>(
+          selector: (state) => state is RegistrationInProgress,
+          builder: (context, inProgress) {
+            return ElevatedButton(
+              onPressed: inProgress
+                  ? null
+                  : () => context
+                      .read<RegistrationBloc>()
+                      .add(const RegistrationCreateAccount()),
+              child: const Text("Создать"),
+            );
+          },
+        ),
       ),
     );
   }

@@ -84,9 +84,9 @@ class RegistrationChangeAvatar extends RegistrationEvent {
   List<Object?> get props => [];
 }
 
-// изменение аватара (
-class RegistrationCreateAccountAvatar extends RegistrationEvent {
-  const RegistrationCreateAccountAvatar();
+// кнопка создания аккаунта
+class RegistrationCreateAccount extends RegistrationEvent {
+  const RegistrationCreateAccount();
 
   @override
   List<Object?> get props => [];
