@@ -21,11 +21,11 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
 
   // ввод данных
   String _email = '';
-  bool _ighlightEmailError = false;
+  bool _highlightEmailError = false;
   RegistrationEmailError? _emailError;
   // ввод данных
   String _password = '';
-  bool _ighlightPasswordError = false;
+  bool _highlightPasswordError = false;
   RegistrationPasswordError? _passwordError;
 
   RegistrationBloc()
@@ -33,6 +33,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
             avatarLink: _avatarBuilder(_defaultAvatarKey))) {
     on<RegistrationChangeAvatar>(_onChangeAvatar);
     on<RegistrationEmailChanged>(_onEmailChanged);
+    on<RegistrationEmailFocusLost>(_onEmailFocusLost);
   }
 
   // изменение аватара при клике на Изменить
@@ -54,11 +55,19 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     _emailError = _validateEmail();
     emit(_calculateFieldsInfo());
   }
+  // потеря фокуса email
+  FutureOr<void> _onEmailFocusLost(
+      final RegistrationEmailFocusLost event,
+      final Emitter<RegistrationState> emit,
+      ) {
+    _highlightEmailError = true;
+    emit(_calculateFieldsInfo());
+  }
   // сбор инф-ии об ошибках заполнении полей email and avatar
   RegistrationFieldsInfo _calculateFieldsInfo() {
     return RegistrationFieldsInfo(
       avatarLink: _avatarBuilder(_avatarKey),
-      emailError: _emailError,
+      emailError: _highlightEmailError ? _emailError : null,
     );
   }
 

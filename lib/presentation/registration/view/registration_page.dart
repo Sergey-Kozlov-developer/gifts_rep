@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gifts_rep/extensions/theme_extension.dart';
@@ -39,7 +40,18 @@ class _RegistrationPageWidgetState extends State<_RegistrationPageWidget> {
   void initState() {
     super.initState();
     _emailFocusNode = FocusNode();
+
     _passwordFocusNode = FocusNode();
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _emailFocusNode.addListener(() {
+        if (!_emailFocusNode.hasFocus) {
+          context
+              .read<RegistrationBloc>()
+              .add(const RegistrationEmailFocusLost());
+        }
+      });
+    });
   }
 
   @override
